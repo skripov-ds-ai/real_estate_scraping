@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "real_estate"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "estate_attempt"
+    volumes:
+      - .:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
