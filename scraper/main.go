@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	// it is not for all items; only for vr
+	// https://www.hongkonghomes.com/en/hong-kong-property/for-sale/happy-valley/fung-fai-terrace-18-19a/83889?
 	graphqlUrl := "https://my.matterport.com/api/mp/models/graph"
 
 	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
@@ -43,6 +45,6 @@ func main() {
 	mp := make(map[string]interface{})
 	json.Unmarshal([]byte(data), &mp)
 	fmt.Println(mp)
-	fmt.Println(data)
+	//fmt.Println(data)
 
 }

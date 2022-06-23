@@ -30,11 +30,11 @@ func CreateHeaders(userAgent, referer string) (m map[string]string) {
 		"accept":          "*/*",
 		"accept-encoding": "gzip, deflate, br",
 		"accept-language": "en-US,en;q=0.9,ru;q=0.8,ja;q=0.7",
-		"content-length":  "2953",
-		"content-type":    "application/json",
-		"dnt":             "1",
-		"origin":          "https://my.matterport.com",
-		"referer":         referer,
+		//"content-length":  "2953",
+		"content-type": "application/json",
+		"dnt":          "1",
+		"origin":       "https://my.matterport.com",
+		"referer":      referer,
 		//"sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"
 		//"sec-ch-ua-mobile: ?0
 		//"sec-ch-ua-platform: "Linux"
@@ -51,15 +51,18 @@ func CreateHeaders(userAgent, referer string) (m map[string]string) {
 	return
 }
 
-func GetModelId(urlString string) (modelId string) {
+func GetModelId(urlString string) (modelId *string, err error) {
 	//	https://my.matterport.com/show/?play=1&m=yFHoSPfUWZF
 	u, err := url.Parse(urlString)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	m, _ := url.ParseQuery(u.RawQuery)
-	return m["m"][0]
+	if result, ok := m["m"]; ok && len(result) > 0 {
+		modelId = &result[0]
+	}
+	return
 }
 
 func CreatePayload(modelId string) (payload map[string]interface{}) {
