@@ -22,17 +22,16 @@ type ReaderType interface {
 
 func GetDataBytes(r io.ReadCloser, encoding string) (data []byte, err error) {
 	var reader ReaderType = r
-
-	if encoding == "gzip" {
-		reader, err = gzip.NewReader(reader)
-		if err != nil {
-			return
-		}
-	} else if encoding == "br" {
+	switch encoding {
+	case "br":
 		reader = cbrotli.NewReader(reader)
+	case "gzip":
+		reader, err = gzip.NewReader(reader)
+	}
+	if err != nil {
+		return
 	}
 	defer reader.Close()
-
 	data, err = ioutil.ReadAll(reader)
 	return
 }
