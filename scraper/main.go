@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
@@ -20,20 +19,23 @@ type ReaderType interface {
 	Read(p []byte) (n int, err error)
 }
 
-func GetDataBytes(r io.ReadCloser, encoding string) (data []byte, err error) {
-	var reader ReaderType = r
-	switch encoding {
-	case "br":
-		reader = cbrotli.NewReader(reader)
-	case "gzip":
-		reader, err = gzip.NewReader(reader)
-	case "deflate":
-		reader = flate.NewReader(reader)
+//func GetDataBytes(r io.ReadCloser, encoding string) (data []byte, err error) {
+func GetDataBytes(resp *http.Response, encoding string) (data []byte, err error) {
+	var reader ReaderType = resp.Body
+	if resp.Uncompressed {
+		switch encoding {
+		case "br":
+			reader = cbrotli.NewReader(reader)
+		case "gzip":
+			reader, err = gzip.NewReader(reader)
+		case "deflate":
+			reader = flate.NewReader(reader)
+		}
+		if err != nil {
+			return
+		}
+		defer reader.Close()
 	}
-	if err != nil {
-		return
-	}
-	defer reader.Close()
 	data, err = ioutil.ReadAll(reader)
 	return
 }
@@ -58,7 +60,7 @@ func main() {
 	var data []byte
 
 	encoding := response.Header["Content-Encoding"][0]
-	data, _ = GetDataBytes(response.Body, encoding)
+	data, _ = GetDataBytes(response, encoding)
 
 	finalString := string(data)
 	//fmt.Println(finalString)
