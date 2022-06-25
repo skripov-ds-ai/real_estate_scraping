@@ -25,6 +25,9 @@ func GetDataBytes(r io.ReadCloser, encoding string) (data []byte, err error) {
 
 	if encoding == "gzip" {
 		reader, err = gzip.NewReader(reader)
+		if err != nil {
+			return
+		}
 	} else if encoding == "br" {
 		reader = cbrotli.NewReader(reader)
 	}
