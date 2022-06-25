@@ -1,14 +1,14 @@
 package main
 
 import (
+	"compress/flate"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
 
-	htmlquery "github.com/antchfx/htmlquery"
-	//cbrotli "github.com/andybalholm/brotli"
+	"github.com/antchfx/htmlquery"
 	"github.com/google/brotli/go/cbrotli"
 	"io/ioutil"
 	"net/http"
@@ -27,6 +27,8 @@ func GetDataBytes(r io.ReadCloser, encoding string) (data []byte, err error) {
 		reader = cbrotli.NewReader(reader)
 	case "gzip":
 		reader, err = gzip.NewReader(reader)
+	case "deflate":
+		reader = flate.NewReader(reader)
 	}
 	if err != nil {
 		return
