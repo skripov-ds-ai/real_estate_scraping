@@ -4,6 +4,7 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
 
 	htmlquery "github.com/antchfx/htmlquery"
@@ -17,6 +18,20 @@ import (
 type ReaderType interface {
 	Close() error
 	Read(p []byte) (n int, err error)
+}
+
+func GetDataBytes(r io.ReadCloser, encoding string) (data []byte, err error) {
+	var reader ReaderType = r
+
+	if encoding == "gzip" {
+		reader, err = gzip.NewReader(reader)
+	} else if encoding == "br" {
+		reader = cbrotli.NewReader(reader)
+	}
+	defer reader.Close()
+
+	data, err = ioutil.ReadAll(reader)
+	return
 }
 
 func main() {
@@ -38,19 +53,9 @@ func main() {
 
 	var data []byte
 
-	//readerCls := strings.NewReader
-	//readerCls := gzip.NewReader
-	//var readerCls ReaderType
-	var reader ReaderType = response.Body
+	encoding := response.Header["Content-Encoding"][0]
+	data, _ = GetDataBytes(response.Body, encoding)
 
-	if encoding := response.Header["Content-Encoding"][0]; encoding == "gzip" {
-		reader, _ = gzip.NewReader(reader)
-	} else if encoding == "br" {
-		reader = cbrotli.NewReader(reader)
-	}
-
-	defer reader.Close()
-	data, _ = ioutil.ReadAll(reader)
 	finalString := string(data)
 	//fmt.Println(finalString)
 
