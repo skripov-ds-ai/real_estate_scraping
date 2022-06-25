@@ -22,7 +22,7 @@ type ReaderType interface {
 //func GetDataBytes(r io.ReadCloser, encoding string) (data []byte, err error) {
 func GetDataBytes(resp *http.Response, encoding string) (data []byte, err error) {
 	var reader ReaderType = resp.Body
-	if resp.Uncompressed {
+	if resp.Uncompressed || encoding != "" {
 		switch encoding {
 		case "br":
 			reader = cbrotli.NewReader(reader)
@@ -40,15 +40,38 @@ func GetDataBytes(resp *http.Response, encoding string) (data []byte, err error)
 	return
 }
 
+func GetEncoding(resp *http.Response) (encoding string) {
+	if encodings, ok := resp.Header["Content-Encoding"]; !ok {
+		return
+	} else if len(encodings) > 0 {
+		return encodings[0]
+	}
+	return
+}
+
+func GetOrdinaryPageHeaders(userAgent string) (m map[string]string) {
+	accept := "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+	m = map[string]string{
+		"Accept":			accept,
+		"Accept-Encoding": 	"gzip, deflate, br",
+		"User-Agent":		userAgent,
+	}
+	return
+}
+
+func SetHeaders(request *http.Request, m *map[string]string) {
+	for k, v := range *m {
+		request.Header.Set(k, v)
+	}
+}
+
 func main() {
 	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
-	accept := "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
 
 	url := "https://www.hongkonghomes.com/en/hong-kong-property/for-sale/western-kennedy-town/tai-pak-terrace/185325?"
 	request, _ := http.NewRequest("GET", url, nil)
-	request.Header.Set("User-Agent", userAgent)
-	request.Header.Set("Accept", accept)
-	request.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	headers := GetOrdinaryPageHeaders(userAgent)
+	SetHeaders(request, &headers)
 
 	client := &http.Client{Timeout: time.Second * 10}
 
@@ -57,10 +80,8 @@ func main() {
 
 	fmt.Println(response.Header)
 
-	var data []byte
-
-	encoding := response.Header["Content-Encoding"][0]
-	data, _ = GetDataBytes(response, encoding)
+	encoding := GetEncoding(response)
+	data, _ := GetDataBytes(response, encoding)
 
 	finalString := string(data)
 	//fmt.Println(finalString)
