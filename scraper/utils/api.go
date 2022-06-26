@@ -333,3 +333,13 @@ func CreatePayload(modelId string) (payload map[string]interface{}) {
 	//`
 	return
 }
+
+func GetOrdinaryPageHeaders(userAgent string) (m map[string]string) {
+	accept := "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+	m = map[string]string{
+		"Accept":          accept,
+		"Accept-Encoding": "gzip, deflate, br",
+		"User-Agent":      userAgent,
+	}
+	return
+}
