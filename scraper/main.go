@@ -67,7 +67,8 @@ func SetHeaders(request *http.Request, m *map[string]string) {
 func main() {
 	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
 
-	url := "https://www.hongkonghomes.com/en/hong-kong-property/for-sale/western-kennedy-town/tai-pak-terrace/185325?"
+	//url := "https://www.hongkonghomes.com/en/hong-kong-property/for-sale/western-kennedy-town/tai-pak-terrace/185325?"
+	url := "https://www.hongkonghomes.com/en/hong-kong-property/for-rent/tsim-sha-tsui/the-arch-block-2a-moon-tower/64427?"
 	request, _ := http.NewRequest("GET", url, nil)
 	headers := GetOrdinaryPageHeaders(userAgent)
 	SetHeaders(request, &headers)
@@ -88,12 +89,15 @@ func main() {
 	doc, _ := htmlquery.Parse(strings.NewReader(finalString))
 	list := htmlquery.Find(doc, "//script[@type=\"application/ld+json\"]/text()")
 
+	fmt.Println()
+
 	for _, l := range list {
 		res := (*l).Data
 
 		var ares map[string]interface{}
 		json.Unmarshal([]byte(res), &ares)
 		fmt.Println(ares)
+		fmt.Println()
 
 		//fmt.Println(res)
 	}
