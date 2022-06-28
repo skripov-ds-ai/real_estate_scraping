@@ -2,6 +2,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:14.4
+    restart: on-failure
     environment:
       POSTGRES_DB: "real_estate"
       POSTGRES_USER: "admin"
@@ -12,5 +13,16 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7.0.2
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass ESTATE
+    volumes:
+      - ./redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:
+    driver: local
