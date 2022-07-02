@@ -12,8 +12,6 @@ import (
 
 var ctx = context.Background()
 
-// 1. add url to scrape
-// 2. add pagination url to scrape
 func main() {
 	port := os.Getenv("PORT")
 	addr := os.Getenv("ADDR")
