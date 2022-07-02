@@ -22,6 +22,18 @@ services:
     volumes:
       - ./redis_data:/data
 
+  receiver:
+    build:
+      dockerfile: ./receiver/Dockerfile
+      context: ./
+    env_file:
+      - receiver/.env
+    restart: on-failure
+    ports:
+      - "8000:3000"
+    depends_on:
+      - redis
+
 volumes:
   postgres_data:
   redis_data:
