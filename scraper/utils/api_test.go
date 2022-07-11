@@ -14,6 +14,13 @@ type StringPair struct {
 	Url string
 }
 
+func BenckmarkGetModelId(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		url := "https://my.matterport.com/show/?play=1&m=nothing"
+		GetModelId(url)
+	}
+}
+
 func TestGetModelId(t *testing.T) {
 	url := "https://my.matterport.com/show/?play=1&m=abcd"
 	result, _ := GetModelId(url)
@@ -36,7 +43,7 @@ func TestGetModelIdProperties(t *testing.T) {
 				result, _ := GetModelId(url)
 				return result == nil
 			},
-			gen.AnyString().Map(func(s string) string {
+			gen.AlphaString().Map(func(s string) string {
 				return fmt.Sprintf("https://%v.com/show/?play=", s)
 			}),
 		),
@@ -49,7 +56,7 @@ func TestGetModelIdProperties(t *testing.T) {
 				result, _ := GetModelId(st.Url)
 				return st.M == "" && result == nil || result != nil && *result == st.M
 			},
-			gen.AnyString().Map(
+			gen.AlphaString().Map(
 				func(s string) StringPair {
 					st := StringPair{
 						M:   s,
